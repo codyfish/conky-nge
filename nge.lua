@@ -6,49 +6,21 @@ function trim(s)
   return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-function conky_main ()
-
-    if conky_window == nil then
-	return
-    end
-    local cs = cairo_xlib_surface_create ( conky_window.display,conky_window.drawable, conky_window.visual, conky_window.width,conky_window.height)
-    cr = cairo_create (cs)
-
-    --local updates = tonumber (conky_parse ('${updates}'))
-    --if updates > 5 then
-    --    print ("hello world")
-    --end
-    
-    cpu = conky_parse ("${cpu}")
-    memory = conky_parse ("${memperc}")
-    home_used = conky_parse ("${fs_used_perc /home}")
-    root_used = conky_parse ("${fs_used_perc /}")
-    data_used = conky_parse ("${fs_used_perc /home/felix/data}")
-    
-
-    --print("cpu")
-    --print(cpu)
-    --print(memory)
-    --print(home_used)
-    --print(root_used)
-    --print(data_used)
-    
-
-    local border_table ={
+local border_table ={
          red = 0,
 	 green = 0,
 	 blue = 0,
 	 alpha = 1,
 	 width = 4
-    }
-    local fill_table ={
+}
+local fill_table ={
          red =1,
 	 green = 0,
 	 blue = 0,
 	 alpha = 1,
-    }
+}
 
-    local chart_font_table = {
+local chart_font_table = {
 	red = 0.3,
 	green = 0.3,
 	blue = 0.3,
@@ -57,8 +29,8 @@ function conky_main ()
 	font_size = 12,
 	font_slant = CAIRO_FONT_SLANT_NORMAL,
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
-    }
-    font_table = {
+}
+local font_table = {
 	red = 0.3,
 	green = 0.3,
 	blue = 0.3,
@@ -68,9 +40,9 @@ function conky_main ()
 	font_slant = CAIRO_FONT_SLANT_NORMAL,
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
 	maxl=10,
-    }
+}
 
-     local  logo_table = {
+local  logo_table = {
 	red = 0.3,
 	green = 0.3,
 	blue = 0.3,
@@ -80,33 +52,28 @@ function conky_main ()
 	font_slant = CAIRO_FONT_SLANT_NORMAL,
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
 	maxl=10,
-    }
+}
 
+local meter_table = {
+	red = 0.2,
+	green = 0.2,
+	blue = 0.2,
+	alpha = 0.6,
+	width = 10,
+	angle = 3/2*math.pi,
+        dred = 0.8,
+	dgreen = 0.5,
+	dblue = 0.5,
+	dalpha = 0.6,
+	tred = 1,
+	tgreen = 0.5,
+	tblue = 0.0,
+	talpha = 0.7,
+	dwidth = 2,
+	font = chart_font_table
+}
 
-
-
-    local meter_table = {
-   	 red = 0.2,
-	 green = 0.2,
-	 blue = 0.2,
-	 alpha = 0.6,
-	 width = 10,
-	 angle = 3/2*math.pi,
-         dred = 0.8,
-	 dgreen = 0.5,
-	 dblue = 0.5,
-	 dalpha = 0.6,
-	 tred = 1,
-	 tgreen = 0.5,
-	 tblue = 0.0,
-	 talpha = 0.7,
-
-	 dwidth = 2,
-
-	 font = chart_font_table
-      }
-
-      local time_table= {
+local time_table= {
 	red = 1,
 	green = 1,
 	blue = 1,
@@ -117,20 +84,41 @@ function conky_main ()
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
 	maxl=7,
 	st = {
+		red = 1,
+		green = 1,
+		blue = 1,
+		alpha = 1,
+		font = "DSEG7 Classic",
+		font_size = 16,
+		font_slant = CAIRO_FONT_SLANT_NORMAL,
+		font_face = CAIRO_FONT_WEIGHT_NORMAL,
+		maxl=7,
+	}
+}
+local sound_table = {
 	red = 1,
-	green = 1,
-	blue = 1,
+	green = 0,
+	blue = 0,
 	alpha = 1,
-	font = "DSEG7 Classic",
-	font_size = 16,
+	font = "InconsolataLGC Nerd Font Mono",
+	font_size = 32,
 	font_slant = CAIRO_FONT_SLANT_NORMAL,
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
-	maxl=7,
+	maxl=10,
+	vt = {
+		red = 1,
+		green = 0,
+		blue = 0,
+		alpha = 1,
+		font = "DSEG7 Classic",
+		font_size = 100,
+		font_slant = CAIRO_FONT_SLANT_NORMAL,
+		font_face = CAIRO_FONT_WEIGHT_NORMAL,
+		maxl=7,
 	}
-      }
+}
 
-      local process_table = {
-
+local process_table = {
 	red = 0.3,
 	green = 0.3,
 	blue = 0.3,
@@ -140,85 +128,89 @@ function conky_main ()
 	font_slant = CAIRO_FONT_SLANT_NORMAL,
 	font_face = CAIRO_FONT_WEIGHT_NORMAL,
 	maxl = 7,
-	st= {
+	st = {
+		red = 0.3,
+		green = 0.3,
+		blue = 0.3,
+		alpha = 1,
+		font = "Arimo Nerd Font",
+		font_size = 25,
+		font_slant = CAIRO_FONT_SLANT_NORMAL,
+		font_face = CAIRO_FONT_WEIGHT_NORMAL,
+		maxl = 10
+	}
+}
 
-	red = 0.3,
-	green = 0.3,
-	blue = 0.3,
+local mpd_table = process_table
+local rect_table = {
+      	red = 0,
+	green = 0,
+	blue = 0,
 	alpha = 1,
-	font = "Arimo Nerd Font",
-	font_size = 25,
-	font_slant = CAIRO_FONT_SLANT_NORMAL,
-	font_face = CAIRO_FONT_WEIGHT_NORMAL,
-	maxl = 10
-      }
+	rect_x = 200,
+	rect_y = 200*1.61,
+}
+local core_table = process_table
 
-      }
-
-      local mpd_table = process_table
-
-      evac = {
+local evac = {
 	border_table = border_table,
 	fill_table = fill_table,
 	font_table = font_table,
-	hexstartx=250,
-	hexstarty=250,
+	rect_table = rect_table,
+	hexstartx=0,
+	hexstarty=0,
 	hexlength = 100,
 	hexgap = 1,
-	meter_table = meter_table,
-	time_table = time_table,
-	process_table = process_table,
-	mpd_table = mpd_table,
-	core_table = process_table
-      }
---    print(conky_parse("${battery_time}"))
-   
+}
 
-    eva_hexagon(cr,0,0,evac)
-    seva_circle_meter(cr,0,1, root_used,"root", 100, evac)
-    seva_circle_meter(cr,1,0 , home_used,"home", 100, evac)
-    seva_circle_meter(cr,2,1 , data_used,"data", 100, evac)
-    eva_time(cr,1,1,evac)
-    eva_disk_usage(cr,2,2,evac)
-    eva_process(cr,3,0,1,evac)
-    eva_process(cr,3,1,2,evac)
-    eva_process(cr,4,0,3,evac)
-    eva_process(cr,4,1,4,evac)
-    eva_process(cr,4,2,5,evac)
-    eva_downspeed(cr,1,2,"wlp0s20f0u3",evac)
-    eva_text(cr,5,0,"asdf",evac.font_table,evac)
-    eva_text(cr,6,4,"",logo_table,evac)
+function conky_main ()
 
-    vouts = conky_parse("${exec pactl list sink-inputs | awk '/application.name = \".+\"/ {print $3}'}")
-
-    lines = {}
-    for s in vouts:gmatch("[^\r\n]+") do
-    	table.insert(lines, s)
+    if conky_window == nil then
+	return
     end
+    local cs = cairo_xlib_surface_create ( conky_window.display,conky_window.drawable, conky_window.visual, conky_window.width,conky_window.height)
+    cr = cairo_create (cs)
+    
+      
+	for r = 0,5 do
+		for c = 0,4 do
+			eva_hexagon(cr,r,c,evac)
+		end
+	end
+	local sound = get_sound_map()
+	for i,e in pairs(sound) do 
+		if i < 4 then
+			draw_eva_sound(cr,300+i*300,400,sound,i,sound_table,evac)
+		end
+	end
 
-    for i,line in next,lines,nil do
-	  vout = string.sub(line,2,-2)
-	  print(vout)
-	  eva_text(cr,7,i,vout,font_table,evac)
-    end
+   	eva_process(cr,6,1,1,process_table,evac)
+	eva_process(cr,6,2,2,process_table,evac)
+	eva_process(cr,6,3,3,process_table,evac)
+	eva_process(cr,6,4,4,process_table,evac)
+	eva_process(cr,6,5,5,process_table,evac)
+	
+	eva_core(cr,7,1,0,core_table,evac)
+	eva_core(cr,7,2,1,core_table,evac)
+	eva_core(cr,7,3,2,core_table,evac)
+	eva_core(cr,7,4,3,core_table,evac)
 
+	eva_hexagon(cr,4,5,evac)
+	eva_upspeed(cr,3,5,"wlp0s20f0u3",evac)	
+	eva_downspeed(cr,3,6,"wlp0s20f0u3",evac)
+	eva_s_time(cr,4,6,time_table,evac)
+	eva_circle_mem(cr,2,6,meter_table,evac)
+	eva_mpd(cr,2,7,mpd_table,evac)
 
+	eva_hexagon(cr,8,3,evac)
+	eva_mem(cr,10,2,evac)
+	eva_cpu_perc(cr,9,2,evac)
+	eva_disk_usage(cr,11,2,meter_table,evac)
+	eva_text(cr,12,2,"",logo_table,evac)
 
-    eva_upspeed(cr,2,3,"wlp0s20f0u3",evac)
-    eva_cpu_perc(cr,2,4,evac)
-    eva_mem(cr,3,2,evac)
-    eva_circle_mem(cr,3,3,evac)
-    eva_3line(cr,1,3,"asdf",font_table,"asdf",font_table,"asdf",font_table,evac)
-    eva_mpd(cr,5,1,evac)
-    eva_temperature(cr,5,2,2,evac)
-    eva_core(cr,5,3,0,evac)
-    eva_core(cr,4,3,1,evac)
-    eva_core(cr,6,0,2,evac)
-    eva_core(cr,6,1,3,evac)
-    eva_s_time(cr,6,2,evac)
-    cairo_destroy (cr)
-    cairo_surface_destroy (cs)
-    cr = nil
+	cairo_destroy (cr)
+	cairo_surface_destroy (cs)
+	cr = nil
 
 end
 
@@ -236,29 +228,29 @@ function eva_hexagon(cr,row,col,evac)
 	draw_eva_hexagon(cr,x,y,evac)
 end
 
-function seva_circle_meter(cr,row,col,value,name,max_value,evac)
+function seva_circle_meter(cr,row,col,value,name,max_value,meter_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_seva_circle_meter(cr,x,y,value,name,max_value,evac)
+	draw_seva_circle_meter(cr,x,y,value,name,max_value,meter_table,evac)
 end
 
-function eva_time(cr,row,col,evac)
+function eva_time(cr,row,col,time_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_time(cr,x,y,evac)
+	draw_eva_time(cr,x,y,time_table,evac)
 end
 
-function eva_s_time(cr,row,col,evac)
+function eva_s_time(cr,row,col,time_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_s_time(cr,x,y,evac)
+	draw_eva_s_time(cr,x,y,time_table,evac)
 end
 
-function eva_disk_usage(cr,row,col,evac)
+function eva_disk_usage(cr,row,col,meter_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_disk_usage(cr,x,y,evac)
+	draw_eva_disk_usage(cr,x,y,meter_table,evac)
 end
 
-function eva_process(cr,row,col,num,evac)
+function eva_process(cr,row,col,num,process_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_process(cr,x,y,num,evac)
+	draw_eva_process(cr,x,y,num,process_table,evac)
 end
 
 function eva_text(cr,row,col,text,f,evac)
@@ -292,9 +284,9 @@ function eva_temperature(cr,row,col,num,evac)
 end
 
 
-function eva_circle_mem(cr,row,col,evac)
+function eva_circle_mem(cr,row,col,meter_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_circle_mem(cr,x,y,evac)
+	draw_eva_circle_mem(cr,x,y,meter_table,evac)
 end
 
 function eva_2line(cr,row,col,l1,f1,l2,f2,evac)
@@ -307,15 +299,17 @@ function eva_3line(cr,row,col,l1,f1,l2,f2,l3,f3,evac)
 	draw_eva_3line(cr,x,y,l1,f1,l2,f2,l3,f3,evac)
 end
 
-function eva_mpd(cr,row,col,evac)
+function eva_mpd(cr,row,col,mpd_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_mpd(cr,x,y,evac)
+	draw_eva_mpd(cr,x,y,mpd_table,evac)
 end
 
-function eva_core(cr,row,col,core,evac)
+function eva_core(cr,row,col,core,core_table,evac)
 	local x,y = hex_pos(row,col,evac)
-	draw_eva_core(cr,x,y,core,evac)
+	draw_eva_core(cr,x,y,core,core_table,evac)
 end
+
+
 -- ###############################################################################################
 --IMPL
 -- ###############################################################################################
@@ -357,6 +351,18 @@ function draw_hexagon(cr, pos_x, pos_y, length, border_table, fill_table)
 	cairo_fill_preserve(cr)
 	cairo_set_source_rgba(cr,bt.red,bt.green,bt.blue,bt.alpha)
         cairo_stroke (cr)
+end
+
+function draw_eva_rectangle(cr,pos_x,pos_y,evac)
+	local rt = evac.rect_table
+	cairo_move_to(cr,pos_x,pos_y)
+	cairo_line_to(cr,pos_x,pos_y-rt.rect_y)
+	cairo_line_to(cr,pos_x-rt.rect_x,pos_y-rt.rect_y)
+	cairo_line_to(cr,pos_x-rt.rect_x,pos_y)
+	cairo_close_path(cr)
+	cairo_set_source_rgba(cr,rt.red,rt.green,rt.blue,rt.alpha)
+	cairo_fill_preserve(cr)
+	cairo_stroke(cr)
 end
 
 
@@ -465,19 +471,19 @@ function circle_meter (cr, value, name,pos_x,pos_y,radius,max_value, meter_table
 end
 
 -- simple circle meter
-function draw_seva_circle_meter(cr,pos_x,pos_y,value,name, max_value, evac)
+function draw_seva_circle_meter(cr,pos_x,pos_y,value,name, max_value,meter_table, evac)
 	draw_eva_hexagon(cr,pos_x,pos_y,evac)
 	-- center of circle
 	local cx = pos_x - evac.hexlength
 	local cy = pos_y
 	local radius = evac.hexlength/2
 
-	circle_meter(cr, value, name, cx,cy,radius,max_value,evac.meter_table)
+	circle_meter(cr, value, name, cx,cy,radius,max_value,meter_table)
 	
 end
 
 -- disk usage of several partitions in one hexagone
-function draw_eva_disk_usage(cr, pos_x,pos_y,evac)
+function draw_eva_disk_usage(cr, pos_x,pos_y,meter_table,evac)
 	draw_eva_hexagon(cr,pos_x,pos_y,evac)
 	-- center of circle
 	local cx = pos_x - evac.hexlength
@@ -488,32 +494,32 @@ function draw_eva_disk_usage(cr, pos_x,pos_y,evac)
   	local root_used = conky_parse ("${fs_used_perc /}")
   	local data_used = conky_parse ("${fs_used_perc /home/felix/data}")
 
-	local r_div = evac.meter_table.width+evac.border_table.width
+	local r_div = meter_table.width+evac.border_table.width
 
-	circle_meter(cr, home_used, "home", cx,cy,radius-r_div,100,evac.meter_table)
-	circle_meter(cr, root_used, "root", cx,cy,radius-2*r_div,100,evac.meter_table)
-	circle_meter(cr, data_used, "data", cx,cy,radius,100,evac.meter_table)
+	circle_meter(cr, home_used, "home", cx,cy,radius-r_div,100,meter_table)
+	circle_meter(cr, root_used, "root", cx,cy,radius-2*r_div,100,meter_table)
+	circle_meter(cr, data_used, "data", cx,cy,radius,100,meter_table)
 	
 end
 
-function draw_eva_time(cr, pos_x, pos_y, evac)
-	local tt = evac.time_table
+function draw_eva_time(cr, pos_x, pos_y,time_table, evac)
+	local tt = time_table
 	draw_eva_hexagon(cr,pos_x,pos_y,evac)
 	local time = conky_parse("${time %H:%M}")
 	--print(time)
 	draw_center_text(cr,pos_x-evac.hexlength,pos_y,time,tt)
 end
 
-function draw_eva_s_time(cr,pos_x,pos_y,evac)
-	local tt = evac.time_table
+function draw_eva_s_time(cr,pos_x,pos_y,time_table,evac)
+	local tt = time_table
 	draw_eva_hexagon(cr,pos_x,pos_y,evac)
 	local t1 = conky_parse("${time %H:%M}")
 	local t2 = conky_parse("${time :%S}")
 	draw_2c_text(cr,pos_x-evac.hexlength,pos_y,t1,tt,t2,tt.st)
 end
 
-function draw_eva_process(cr, pos_x,pos_y,num, evac)
-	local pt = evac.process_table
+function draw_eva_process(cr, pos_x,pos_y,num,process_table, evac)
+	local pt = process_table
  	local name = conky_parse("${top name "..num.."}")
  	local cpu = conky_parse("${top cpu "..num.."}")
  	local mem = conky_parse("${top mem "..num.."}")
@@ -582,7 +588,7 @@ function draw_eva_temperature(cr,pos_x,pos_y,num,evac)
 	draw_eva_2line(cr,pos_x,pos_y,symbol,evac.font_table,temp,evac.font_table,evac)
 end
 
-function draw_eva_circle_mem(cr,pos_x,pos_y,evac)
+function draw_eva_circle_mem(cr,pos_x,pos_y,meter_table,evac)
 	local memperc = conky_parse("${memperc}")
 	local swapperc = conky_parse("${swapperc}")
 
@@ -593,15 +599,15 @@ function draw_eva_circle_mem(cr,pos_x,pos_y,evac)
 	local radius = evac.hexlength/2
 	
 
-	local r_div = evac.meter_table.width+evac.border_table.width
+	local r_div = meter_table.width+evac.border_table.width
 
-	circle_meter(cr, swapperc, "swap", cx,cy,radius-r_div,100,evac.meter_table)
-	circle_meter(cr, memperc, "mem", cx,cy,radius,100,evac.meter_table)
+	circle_meter(cr, swapperc, "swap", cx,cy,radius-r_div,100,meter_table)
+	circle_meter(cr, memperc, "mem", cx,cy,radius,100,meter_table)
 end
 
-function draw_eva_mpd(cr,pos_x,pos_y,evac)
+function draw_eva_mpd(cr,pos_x,pos_y,mpd_table,evac)
 
-	local mt = evac.mpd_table
+	local mt = mpd_table
 	local title = conky_parse("${mpd_title}")
 	local artist = conky_parse("${mpd_artist}")
 	local album = conky_parse("${mpd_album}")
@@ -609,11 +615,77 @@ function draw_eva_mpd(cr,pos_x,pos_y,evac)
 	draw_eva_3line(cr,pos_x,pos_y,artist,mt.st,title,mt,album,mt.st,evac)
 end
 
-function draw_eva_core(cr,pos_x,pos_y,core,evac)
-	local ft = evac.core_table
+function draw_eva_core(cr,pos_x,pos_y,core,core_table,evac)
+	local ft = core_table
 	local freq = conky_parse("${freq_g " .. (core+1).."}GHz")
 	local temp = conky_parse("${platform coretemp.0/hwmon/hwmon2 temp "..(core+2).."}°C")
 
 	draw_eva_3line(cr,pos_x,pos_y,freq,ft.st,"Core "..core,ft,temp,ft.st,evac)
 end
 
+
+function draw_eva_sound(cr,pos_x,pos_y,sounds,index,sound_table,evac)
+	draw_eva_rectangle(cr,pos_x,pos_y,evac)
+	
+	sound = sounds[index]
+	draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-evac.rect_table.rect_y+sound_table.font_size,sound['name'],sound_table)
+	draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-evac.rect_table.rect_y/2,sound['volume'],sound_table.vt)
+
+	if (sound['has_in'] and sound['has_out']) then
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-2*sound_table.font_size,"input &",sound_table)
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-sound_table.font_size,"output",sound_table)
+	elseif (sound['has_in'] and not sound['has_out']) then
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-2*sound_table.font_size,"input",sound_table)
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-sound_table.font_size,"only",sound_table)
+	elseif (not sound['has_in'] and sound['has_out']) then
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-2*sound_table.font_size,"output",sound_table)
+		draw_center_text(cr,pos_x-evac.rect_table.rect_x/2,pos_y-sound_table.font_size,"only",sound_table)
+	end
+
+end
+
+
+function get_sound_map()
+
+	local result = {}
+
+	-- awk -F -> " als seperator zwischen $1 und $2
+	local outs = conky_parse("${exec pactl list sink-inputs | awk -F '\"' '/application.name = \".+\"/ {print $2}'}")
+	local vols = conky_parse("${exec pactl list sink-inputs | awk '/[0-9][0-9]%/ {print $5}'}")
+
+	local i = 0
+	for name in outs:gmatch("[^\r\n]+") do
+		entry = {}
+		entry ['name'] = name
+		entry['has_out'] = true
+		entry['has_in'] = false
+		result[i] = entry
+		i = i+ 1
+	end
+
+	i = 0
+	for vol in vols:gmatch("[^\r\n]+") do
+		result[i]['volume']=string.sub(vol,1,-2)
+		i = i + 1
+	end
+
+	local ins = conky_parse("${exec pactl list source-outputs | awk -F '\"' '/application.name = \".+\"/ {print $2}'}")
+	for name in ins:gmatch("[^\r\n]+") do
+		local success = false
+		for i,e in pairs(result) do
+			if e['name'] == name then
+				e['has_in'] = true
+				success = true
+			end
+		end
+		if (not success) then
+			entry = {}
+			entry['name'] =  name
+			entry['has_out'] = false
+			entry['has_in'] = true
+			entry['volume'] = 0
+			table.insert(result,entry)
+		end
+	end
+	return result
+end
